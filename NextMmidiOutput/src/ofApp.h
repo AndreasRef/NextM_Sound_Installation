@@ -12,6 +12,8 @@ class ofApp: public ofBaseApp
 public:
     void setup();
     void draw();
+    void update();
+    void startTimer();
     
     //MIDI
     ofxMidiOut midiOut;
@@ -28,11 +30,22 @@ public:
     int totalSeconds = 0;
     int currentSecond = 0;
     
-
-    //TIMER
-    float startTime; // store when we start time timer
-    float endTime; // when do want to stop the timer
-    bool  bTimerReached; // used as a trigger when we hit the timer
+    
+    //NEW TIMER
+    float seconds;
+    float timeSpan;
+    float timeStart;
+    float timeEnd;
+    float timeElapsed = 0;
+    int numberOfEvents = 0;
+    int currentEvent = 0;
+    float eventStop = 0;
+    float timeEvent;
+    bool running;
+    
+    vector<float> durations;
+    vector<float> noteStartTimes;
+    vector<float> noteStopTimes;
     
     
     //GUI
@@ -41,5 +54,6 @@ public:
     
     
     int conversionCount;
+    string dateString;
     
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxMidi.h"
 
 class ofApp : public ofBaseApp{
 	public:
@@ -38,5 +39,16 @@ class ofApp : public ofBaseApp{
         vector<float> durations;
         vector<float> noteStartTimes;
         vector<float> noteStopTimes;
+    
+    
+    
+    //MIDI
+    ofxMidiOut midiOut;
+    int channel;
+    
+    unsigned int currentPgm;
+    int note, velocity;
+    int pan, bend, touch, polytouch;
+    
     
 };

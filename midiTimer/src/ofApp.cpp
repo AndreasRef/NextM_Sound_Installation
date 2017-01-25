@@ -6,6 +6,20 @@ void ofApp::setup(){
     timeSpan = seconds * 1000;
     running = false;
     startTimer();
+    
+    //MIDI
+    
+    midiOut.listPorts(); // via instance
+    midiOut.openPort(0); // by number
+    
+    channel = 1;
+    currentPgm = 0;
+    note = 0;
+    velocity = 0;
+    pan = 0;
+    bend = 0;
+    touch = 0;
+    polytouch = 0;
 }
 
 //--------------------------------------------------------------
@@ -15,7 +29,7 @@ void ofApp::startTimer() {
     timeStart = ofGetElapsedTimeMillis();
     timeEnd = timeSpan;
     
-    numberOfEvents = round(ofRandom(0,10));
+    numberOfEvents = round(ofRandom(0,10)); //Replace this with number of conversions
     timeEvent = timeSpan / numberOfEvents;
     currentEvent = 0;
     eventStop = timeEvent;
@@ -73,6 +87,14 @@ void ofApp::update(){
                 currentEvent++;
                 ofLog() << "Start: " + ofToString(currentEvent);
                 ofLog() << "Stop after " + ofToString(duration);
+                
+                //MIDI
+                
+                note =64;
+                velocity = 64;
+                midiOut.sendNoteOn(channel, note,  velocity);
+                midiOut.sendNoteOff(channel, note,  velocity);
+                
             }
         
         }
