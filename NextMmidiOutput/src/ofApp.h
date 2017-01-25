@@ -1,34 +1,25 @@
 #pragma once
 
+
 #include "ofMain.h"
-#include "ofxMidi.h"
 #include "ofxJSON.h"
+#include "ofxMidi.h"
 #include "ofxGUI.h"
 
-class ofApp : public ofBaseApp {
 
+class ofApp: public ofBaseApp
+{
 public:
-
-	void setup();
-	void update();
-	void draw();
-	void exit();
-	
-	void keyPressed (int key);
-	void keyReleased (int key);
-	
+    void setup();
+    void draw();
     
-    void mousePressed (int x, int y, int button);
-    void mouseReleased (int x, int y, int button);
+    //MIDI
+    ofxMidiOut midiOut;
+    int channel;
     
-	
-	ofxMidiOut midiOut;
-	int channel;
-	
-	unsigned int currentPgm;
-	int note, velocity;
-	int pan, bend, touch, polytouch;
-    
+    unsigned int currentPgm;
+    int note, velocity;
+    int pan, bend, touch, polytouch;
     
     //JSON
     ofxJSONElement jsonData;
@@ -37,7 +28,7 @@ public:
     int totalSeconds = 0;
     int currentSecond = 0;
     
-    
+
     //TIMER
     float startTime; // store when we start time timer
     float endTime; // when do want to stop the timer
@@ -49,6 +40,6 @@ public:
     ofxPanel gui;
     
     
-    //DEBUG
-    int tv2Count = 0;
+    int conversionCount;
+    
 };
