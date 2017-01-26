@@ -64,39 +64,45 @@ void ofApp::startTimer() {
     timeStart = ofGetElapsedTimeMillis();
     timeEnd = timeSpan;
     
-    numberOfEvents = conversionCount; // round(ofRandom(0,10));
+    numberOfEvents = conversionCount;
     timeEvent = timeSpan / numberOfEvents;
     currentEvent = 0;
     eventStop = timeEvent;
     
-    int n = 0;
+    int n = 0; //Counter for the event number
     
-    dateString = timestamps[currentSecond];
+    //dateString = timestamps[currentSecond];
     for (int i = 0; i < totalItems; i++) {
         if (jsonData[i]["datetime"].asString() == dateString) {
             if (jsonData[i]["event_type (impression)"] == "pc_conv" || jsonData[i]["event_type (impression)"] == "pv_conv" ) {
                 //conversionCount++;
-                        
+                
                 cout << "eventJSON: " + ofToString(i) << endl;
                 
-                float _duration = ofRandom(100,1000);
+                int _brand_id = jsonData[i]["brand_id"].asInt() % 12;
+                
+                
+                //float _duration = ofRandom(100,1000);
+                
+                int _volume = ofMap(jsonData[i]["width"].asInt(), 0, 1000, 64, 100);
+                
+                float _duration = ofMap(jsonData[i]["height"].asInt(), 0, 1000, 10, 3000);
+                
                 float _startTime = timeStart + (timeEvent * n);
                 //        ofLog() << ofToString(i) + ": " + ofToString(duration);
                 string _id = "id-" + ofToString(idInt);
                 Note note;
                 
-                note.setup(_startTime, _duration, idInt);
+                note.setup(_startTime, _duration, _volume, idInt, _brand_id);
                 notes.push_back(note);
                 idInt++;
 
-//                ofLog() << jsonData[i]["geo_region"];
-                
+//              ofLog() << jsonData[i]["geo_region"];
                 
                 n++;
             }
         }
     }
-    
     
     ofLog() << ofToString("Start timer with " + ofToString(numberOfEvents) + " events");
     
@@ -117,8 +123,6 @@ void ofApp::update(){
             if (jsonData[i]["datetime"].asString() == dateString) {
                 if (jsonData[i]["event_type (impression)"] == "pc_conv" || jsonData[i]["event_type (impression)"] == "pv_conv" ) {
                     conversionCount++;
-                    
-                    //ofLog() << jsonData[i]["geo_region"];
                 }
             }
         }
@@ -132,36 +136,39 @@ void ofApp::update(){
         
         // Notes
         for (int i = 0; i < notes.size(); i++) {
-            if (!notes[i].started) {
-                if (ofGetElapsedTimeMillis() >= notes[i].startTime) {
-                    notes[i].started = true;
-                    
-                    // Start note
-                    ofLog() << "Start note " + ofToString(notes[i].id);
-                    
-                    //MIDI
-                    midiNote =round(ofRandom(12)) + 60;
-                    velocity = 64;
-                    
-                    midiOut.sendNoteOn(channel, midiNote,  velocity);
-                    
+            //if (!notes[i].killAble) {
+                
+                if (!notes[i].started) {
+                    if (ofGetElapsedTimeMillis() >= notes[i].startTime) {
+                        notes[i].started = true;
+                        
+                        // Start note
+                        ofLog() << "Start note " + ofToString(notes[i].id);
+                        
+                        //MIDI
+                        midiNote =notes[i].brand_id + 60;
+                        velocity = notes[i].volume;
+                        
+                        midiOut.sendNoteOn(channel, midiNote,  velocity);
+                        
+                    }
+                }else if (notes[i].started) {
+                    if (ofGetElapsedTimeMillis() >= notes[i].startTime + notes[i].duration) {
+                        ofLog() << "Stop note " + ofToString(notes[i].id);
+                        notes[i].killAble = true;
+                        
+                        
+                        //MIDI
+                        midiNote = notes[i].brand_id + 60;
+                        velocity = 0; //64;
+                        
+                        midiOut.sendNoteOff(channel, midiNote,  velocity);
+                        
+                    }else{
+                        notes[i].percent = (ofGetElapsedTimeMillis() - notes[i].startTime) / notes[i].duration;
+                    }
                 }
-            }else if (notes[i].started) {
-                if (ofGetElapsedTimeMillis() >= notes[i].startTime + notes[i].duration) {
-                    ofLog() << "Stop note " + ofToString(notes[i].id);
-                    notes[i].killAble = true;
-                    
-                    
-                    //MIDI
-                    midiNote = round(ofRandom(12)) + 60;
-                    velocity = 64;
-                    
-                    midiOut.sendNoteOff(channel, midiNote,  velocity);
-                    
-                }else{
-                    notes[i].percent = (ofGetElapsedTimeMillis() - notes[i].startTime) / notes[i].duration;
-                }
-            }
+            //}
         }
         
         
@@ -196,32 +203,27 @@ void ofApp::draw(){
     ofDrawBitmapString(dateString, 20, 20);
     ofDrawBitmapString(ofToString(numberOfEvents) + " events", 180, 20);
     
-    /*
-     ofBackground(0, 0, 0);
-     
-     ofSetColor(255, 255, 255);
-     ofDrawBitmapString("Timespan: " + ofToString(seconds) + " seconds", 100, 40);
-     ofDrawBitmapString(ofToString(numberOfEvents) + " events", 100, 80);
-     ofDrawBitmapString("Countdown: " + ofToString(timeSpan - timeElapsed) + " milliseconds", 100, 120);
-     
-     for (int i = 0; i < numberOfEvents; i++) {
-     ofSetColor(255, 255, 255);
-     if (currentEvent - 1 == i) {
-     ofSetColor(255, 0, 0);
-     }
-     ofDrawRectangle((i * 62) + 100, 300, 60, 20);
-     }
-     */
-    
     for (int i = 0; i < notes.size(); i++) {
         if (notes[i].started) {
             notes[i].draw();
         }
     }
     
-    
     gui.draw();
 }
+
+//--------------------------------------------------------------
+void ofApp::exit(){
+
+    //note off for alle notes //DOES NOT WORK EVERY TIME??
+    for (int i = 0; i<127; i++){
+    midiOut.sendNoteOff(channel, i,  0);
+    }
+    
+    // clean up
+    midiOut.closePort();
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
