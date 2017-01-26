@@ -34,9 +34,9 @@ void ofApp::startTimer() {
     currentEvent = 0;
     eventStop = timeEvent;
     
-    durations.clear();
-    noteStartTimes.clear();
-    noteStopTimes.clear();
+//    durations.clear();
+//    noteStartTimes.clear();
+//    noteStopTimes.clear();
     for (int i = 0; i < numberOfEvents; i++) {
         float duration = ofRandom(500, 6000);
         durations.push_back(duration);
@@ -72,18 +72,21 @@ void ofApp::update(){
             
 
             running = false;
-            startTimer();
+            //startTimer();
         }else{
             
             if (timeElapsed >= (eventStop * currentEvent)) {
                 if (currentEvent > 0) {
 //                    ofLog() << "Stop: " + ofToString(currentEvent);
                 }
-                float duration = durations[currentEvent];
+                float duration = durations[currentEvent ];
                 float eventStartTime = ofGetElapsedTimeMillis();
                 float eventStopTime = eventStartTime + duration;
                 noteStartTimes.push_back(eventStartTime);
                 noteStopTimes.push_back(eventStopTime);
+//                noteStartTimes[eventStartTime] = eventStartTime + duration;
+//                noteStartTimes[eventStartTime] = eventStopTime;
+                
                 currentEvent++;
                 ofLog() << "Start: " + ofToString(currentEvent);
                 ofLog() << "Stop after " + ofToString(duration);
@@ -95,6 +98,7 @@ void ofApp::update(){
                 midiOut.sendNoteOn(channel, note,  velocity);
                 midiOut.sendNoteOff(channel, note,  velocity);
                 
+                hackInt++;
             }
         
         }

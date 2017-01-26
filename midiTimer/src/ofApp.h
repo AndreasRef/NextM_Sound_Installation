@@ -24,7 +24,7 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
     
-    
+        int hackInt = 0;
         float seconds;
         float timeSpan;
         float timeStart;

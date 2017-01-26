@@ -36,9 +36,7 @@ void ofApp::setup()
                 totalSeconds++;
             }
         }
-        
         ofLog() << "Secs: " + ofToString(totalSeconds);
-        
     }
     else
     {
@@ -101,11 +99,13 @@ void ofApp::update(){
         currentSecond = 0;
     }
     
-    
     if (noteStopTimes.size() > 0) {
         for (int i = 0; i < noteStopTimes.size(); i++) {
             float noteTimeElapsed = ofGetElapsedTimeMillis() - noteStartTimes[i];
             if (noteStopTimes[i] != -1 && noteTimeElapsed >= noteStopTimes[i]) {
+                
+                //STOP MIDI HERE?
+                //midiOut.sendNoteOff(channel, note,  velocity);
                 ofLog() << "Stop note: " + ofToString(i);
                 noteStopTimes[i] = -1;
             }
@@ -135,11 +135,15 @@ void ofApp::update(){
                 noteStopTimes.push_back(eventStopTime);
                 currentEvent++;
                 ofLog() << "Start: " + ofToString(currentEvent);
+                
+                //START MIDI HERE?
+                //midiOut.sendNoteOn(channel, note,  velocity);
                 ofLog() << "Stop after " + ofToString(duration);
                 
                 //MIDI
-                note =64;
+                note =60;
                 velocity = 64;
+                
                 midiOut.sendNoteOn(channel, note,  velocity);
                 midiOut.sendNoteOff(channel, note,  velocity);
                 
@@ -152,10 +156,7 @@ void ofApp::update(){
 void ofApp::draw() {
     ofBackground(0, 0, 0);
     ofSetColor(255);
-    
     ofDrawBitmapString(dateString, 20, 20);
-    
-    ofSetColor(255);
     //ofDrawBitmapString("Timespan: " + ofToString(millisPerSecond) + " ms", 100, 40);
     ofDrawBitmapString(ofToString(numberOfEvents) + " events", 180, 20);
     //ofDrawBitmapString("Countdown: " + ofToString(timeSpan - timeElapsed) + " milliseconds", 100, 120);
