@@ -69,19 +69,34 @@ void ofApp::startTimer() {
     currentEvent = 0;
     eventStop = timeEvent;
     
+    int n = 0;
+    
+    dateString = timestamps[currentSecond];
+    for (int i = 0; i < totalItems; i++) {
+        if (jsonData[i]["datetime"].asString() == dateString) {
+            if (jsonData[i]["event_type (impression)"] == "pc_conv" || jsonData[i]["event_type (impression)"] == "pv_conv" ) {
+                //conversionCount++;
+                        
+                cout << "eventJSON: " + ofToString(i) << endl;
+                
+                float _duration = ofRandom(100,1000);
+                float _startTime = timeStart + (timeEvent * n);
+                //        ofLog() << ofToString(i) + ": " + ofToString(duration);
+                string _id = "id-" + ofToString(idInt);
+                Note note;
+                
+                note.setup(_startTime, _duration, idInt);
+                notes.push_back(note);
+                idInt++;
 
-    for (int i = 0; i < numberOfEvents; i++) {
-        //float _duration = ofRandom(timeSpan,timeSpan);
-        float _duration = ofRandom(1000,3000);
-        float _startTime = timeStart + (timeEvent * i);
-        //        ofLog() << ofToString(i) + ": " + ofToString(duration);
-        string _id = "id-" + ofToString(idInt);
-        Note note;
-        
-        note.setup(_startTime, _duration, idInt);
-        notes.push_back(note);
-        idInt++;
+//                ofLog() << jsonData[i]["geo_region"];
+                
+                
+                n++;
+            }
+        }
     }
+    
     
     ofLog() << ofToString("Start timer with " + ofToString(numberOfEvents) + " events");
     
